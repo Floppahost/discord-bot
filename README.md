@@ -1,4 +1,4 @@
-# discord-bot
+# discord-js-boilerplate
 
 This is a Discord.js v14 Template.
 
