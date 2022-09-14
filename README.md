@@ -1,6 +1,10 @@
 # discord-bot
 
+This is a Discord.js v14 Template.
+
 ## Setup
+
+> Make sure you have [Node.js](https://nodejs.dev/) installed!
 
 ### Creating an `.env` file
 
@@ -18,4 +22,12 @@ Run the following command to install all dependencies:
 
 ```bash
 yarn install
+```
+
+### Run the bot
+
+Run the bot using the following command:
+
+```bash
+node index.js
 ```
