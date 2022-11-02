@@ -6,7 +6,7 @@ export const Ping: Command = {
     description: "Returns latency.",
     type: 1,
     run: async (client: Client, interaction: CommandInteraction) => {
-        const content = `🏓 Pong! \n\`\`\`Latency: ${interaction.createdTimestamp - Date.now()}ms \nAPI Latency: ${Math.round(client.ws.ping)}ms\`\`\``;
+        const content = `🏓 Pong! \n\`\`\`Latency: ${Date.now() - interaction.createdTimestamp}ms \nAPI Latency: ${Math.round(client.ws.ping)}ms\`\`\``;
 
         await interaction.followUp({
             ephemeral: true,

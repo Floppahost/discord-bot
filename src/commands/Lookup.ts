@@ -1,5 +1,10 @@
 import { MessageEmbed, CommandInteraction, Client } from "discord.js";
+import axios from 'axios';
+import dotenv from 'dotenv';
 import { Command } from "../interfaces/Command";
+import GetUsersResponse from "./../types/GetUsersResponse";
+
+dotenv.config();
 
 export const Lookup: Command = {
     name: "lookup",
@@ -7,57 +12,110 @@ export const Lookup: Command = {
     type: 1,
     options: [
         {
-            type: "USER",
-            name: "user",
-            description: "The user you want to look up.",
-            required: false,
+            type: "STRING",
+            name: "username",
+            description: "The username of the user you want to look up.",
+            required: true,
         }
     ],
     run: async (client: Client, interaction: CommandInteraction) => {
-        console.log(interaction)
-        let user = interaction.options.getUser('user');
-        if (!interaction.options.getUser('user')) {
-            user = interaction.user;
-        }
-        if (user?.accentColor === null) {
-            user.accentColor = undefined;
-        }
+        const user = interaction.options.getString('username');
 
-        /* fetch user information
-            fetch returns data
-
-            hostUser {
-                name<string>: data.name,
-                uid<number>: data.uid,
-                invites<number>: data.invites,
-                invited<number>: data.invitedUsers.length,
-                files<number>: data.files,
-                storageUsed<number>: data.storageUsed, // in MB
-                invitedBy<string>: data.invitedBy,
-                currentDomain<string>: data.domain,
+        const { status, data } = await axios.get<GetUsersResponse>(
+            `${process.env.baseurl}/api/profile/get`,
+            {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${process.env.jwt}`
+                },
+                data: { username: user }
             }
-        /*
+        );
 
-            if (!hostUser) {
-                ...
+        if (status === 401) {
+            await interaction.followUp({
+                ephemeral: true,
+                content: 'An error occured while fetching the requested data.'
+            });
+            return;
+        } else if (status === 404) {
+            await interaction.followUp({
+                ephemeral: true,
+                content: 'There is no user with this username.'
+            });
+            return;
+        } else {
+            if (status != 200) {
+                await interaction.followUp({
+                    ephemeral: true,
+                    content: 'An error occured while fetching the requested data.'
+                });
+                return;
             }
-        */
+        }
+        
+        if (typeof(data.data?.uploads) === undefined) {
+            if (typeof(data.data?.bio) === undefined) {
+                const embed = new MessageEmbed({
+                    title: `Profile of ${user}`,
+                    author: { name: user!, icon_url: data.data?.avatar },
+                    fields: [
+                        { name: 'General', value: `Username: \`${user}\` \nUser ID: \`${data.data?.uid}\`` },
+                    ],
+                    footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
+                });
 
-        const embed = new MessageEmbed({
-            color: user?.accentColor,
-            title: `${user!.username}#${user!.discriminator}`,
-            // url: 'link to user profile'
-            fields: [
-                { name: 'General', value: `Username: \`hostUser.name\` \nUser ID: \`hostUser.uid\` \nDiscord ID: \`${user!.id}\`` },
-                { name: 'Stats', value: `Invites: \`hostUser.invites\` \nInvited: \`hostUser.invited\` \nFiles: \`hostUser.files\` \nStorage used: \`hostUser.storageUsed\`` },
-                { name: 'Misc', value: `Invited by: \`hostUser.invitedBy\` \nCurrent domain: \`hostUser.currentDomain\`` },
-            ],
-            footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
-        });
+                await interaction.followUp({
+                    ephemeral: true,
+                    embeds: [ embed ]
+                });
+            } else {
+                const embed = new MessageEmbed({
+                    title: `Profile of ${user}`,
+                    author: { name: user!, icon_url: data.data?.avatar },
+                    fields: [
+                        { name: 'General', value: `Username: \`${user}\` \nUser ID: \`${data.data?.uid}\` \nBio: \`${data.data?.bio}\`` },
+                    ],
+                    footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
+                });
 
-        await interaction.followUp({
-            ephemeral: true,
-            embeds: [ embed ]
-        });
+                await interaction.followUp({
+                    ephemeral: true,
+                    embeds: [ embed ]
+                });
+            }
+        } else {
+            if (typeof(data.data?.bio) === undefined) {
+                const embed = new MessageEmbed({
+                    title: `Profile of ${user}`,
+                    author: { name: user!, icon_url: data.data?.avatar },
+                    fields: [
+                        { name: 'General', value: `Username: \`${user}\` \nUser ID: \`${data.data?.uid}\`` },
+                        { name: 'Stats', value: `Uploads: \`${data.data?.uploads}\`` },
+                    ],
+                    footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
+                });
+
+                await interaction.followUp({
+                    ephemeral: true,
+                    embeds: [ embed ]
+                });
+            } else {
+                const embed = new MessageEmbed({
+                    title: `Profile of ${user}`,
+                    author: { name: user!, icon_url: data.data?.avatar },
+                    fields: [
+                        { name: 'General', value: `Username: \`${user}\` \nUser ID: \`${data.data?.uid}\` \nBio: \`${data.data?.bio}\`` },
+                        { name: 'Stats', value: `Uploads: \`${data.data?.uploads}\`` },
+                    ],
+                    footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
+                });
+
+                await interaction.followUp({
+                    ephemeral: true,
+                    embeds: [ embed ]
+                });
+            }
+        }
     }
 }; 

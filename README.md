@@ -8,6 +8,8 @@ Grab your Discord bot token and put it into the `.env` file:
 
 ```bash
 token="DISCORD_BOT_TOKEN_HERE"
+baseurl="https://your.domain"
+jwt="BOT_JSON_WEBTOKEN"
 ```
 
 In order to install all required dependencies, run:
@@ -36,5 +38,6 @@ npm run start
 
 ### To-Do
 - [ ] `src/commands/Lookup.ts`: fetch user information (by user id)? => API Route
-- [ ] invite command
-- [ ] invite wave command
+- [ ] `src/commands/InviteWave` => API Route
+- [ ] `src/commands/Lookup` Debug
+- [ ] `src/commands/Blacklist` => hostUser => API
