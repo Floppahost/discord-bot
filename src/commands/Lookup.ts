@@ -26,7 +26,7 @@ export const Lookup: Command = {
             {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer ${process.env.jwt}`
+                    Authorization: `${process.env.jwt}`
                 },
                 data: { username: user }
             }
