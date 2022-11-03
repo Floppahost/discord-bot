@@ -1,4 +1,4 @@
-import { CommandInteraction, Client } from "discord.js";
+import { CommandInteraction, Client, MessageEmbed } from "discord.js";
 import axios from "axios";
 import dotenv from 'dotenv';
 import { Command } from "../interfaces/Command";
@@ -23,27 +23,36 @@ export const InviteWave: Command = {
         );
 
         if (status === 200) {
-            const content = `Successfully gave an invite to everyone.`;
+            const embed = new MessageEmbed({
+                title: `Successfully gave an invite to everyone!`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
 
             await interaction.followUp({
                 ephemeral: true,
-                content
+                embeds: [ embed ]
             });
             return;
         } else if (status === 400) {
-            const content = `Invite only is turned off.`;
+            const embed = new MessageEmbed({
+                title: `Invite only is turned off.`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
 
             await interaction.followUp({
                 ephemeral: true,
-                content
+                embeds: [ embed ]
             });
             return;
         } else {
-            const content = `Error while creating invite wave.`;
+            const embed = new MessageEmbed({
+                title: `Error while creating invite wave.`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
 
             await interaction.followUp({
                 ephemeral: true,
-                content
+                embeds: [ embed ]
             });
             return;
         }

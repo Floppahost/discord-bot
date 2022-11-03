@@ -33,22 +33,37 @@ export const Lookup: Command = {
         );
 
         if (status === 401) {
+            const embed = new MessageEmbed({
+                title: `An error occured while fetching the requested data.`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
+
             await interaction.followUp({
-                ephemeral: true,
-                content: 'An error occured while fetching the requested data.'
+                ephemeral: true,            
+                embeds: [ embed ]
             });
             return;
         } else if (status === 404) {
+            const embed = new MessageEmbed({
+                title: `There is no user with this username.`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
+
             await interaction.followUp({
                 ephemeral: true,
-                content: 'There is no user with this username.'
+                embeds: [ embed ]
             });
             return;
         } else {
             if (status != 200) {
+                const embed = new MessageEmbed({
+                    title: `An error occured while fetching the requested data.`,
+                    footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+                });
+
                 await interaction.followUp({
                     ephemeral: true,
-                    content: 'An error occured while fetching the requested data.'
+                    embeds: [ embed ]
                 });
                 return;
             }
