@@ -37,7 +37,5 @@ npm run start
 ```
 
 ### To-Do
-- [ ] `src/commands/Lookup.ts`: fetch user information (by user id)? => API Route
-- [ ] `src/commands/InviteWave` => API Route
 - [ ] `src/commands/Lookup` Debug
 - [ ] `src/commands/Blacklist` => hostUser => API

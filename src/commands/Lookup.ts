@@ -22,13 +22,12 @@ export const Lookup: Command = {
         const user = interaction.options.getString('username');
 
         const { status, data } = await axios.get<GetUsersResponse>(
-            `${process.env.baseurl}/api/profile/get`,
+            `${process.env.baseurl}/profile/get/${user}`,
             {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `${process.env.jwt}`
                 },
-                data: { username: user }
             }
         );
 
