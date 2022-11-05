@@ -1,5 +1,10 @@
-import { MessageEmbed, CommandInteraction, Client } from "discord.js";
+import { CommandInteraction, Client, MessageEmbed } from "discord.js";
+import axios from "axios";
+import dotenv from 'dotenv';
 import { Command } from "../interfaces/Command";
+import GetUsersResponse from "./../types/GetUsersResponse";
+
+dotenv.config();
 
 export const Unblacklist: Command = {
     name: "unblacklist",
@@ -8,40 +13,56 @@ export const Unblacklist: Command = {
     defaultMemberPermissions: 'ADMINISTRATOR',
     options: [
         {
-            type: "USER",
-            name: "user",
-            description: "The user you want to unblacklist.",
+            type: "STRING",
+            name: "username",
+            description: "The username of the user you want to unblacklist.",
             required: true,
         }
     ],
     run: async (client: Client, interaction: CommandInteraction) => {
-        let user = interaction.options.getUser('user');
-        if (!interaction.options.getUser('user')) {
-            user = interaction.user;
+        const user = interaction.options.getUser('user');
+
+        const { status, data } = await axios.get<GetUsersResponse>(
+            `${process.env.baseurl}/admin/unblacklist`,
+            {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `${process.env.jwt}`
+                },
+                data: { username: user }
+            }
+        );
+
+        if (status === 200) {
+            const embed = new MessageEmbed({
+                title: `Successfully unblacklisted ${user}!`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
+
+            await interaction.followUp({
+                ephemeral: true,
+                embeds: [ embed ]
+            });
+        } else if (status === 404) {
+            const embed = new MessageEmbed({
+                title: `There is no user with the name ${user}!`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
+
+            await interaction.followUp({
+                ephemeral: true,
+                embeds: [ embed ]
+            });
+        } else {
+            const embed = new MessageEmbed({
+                title: `Error while unblacklisting user.`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
+
+            await interaction.followUp({
+                ephemeral: true,
+                embeds: [ embed ]
+            });
         }
-        if (user?.accentColor === null) {
-            user.accentColor = undefined;
-        }
-
-        /* user.id = user discord id
-            fetch unblacklist
-            if (!success) return;
-        */
-
-        const embed = new MessageEmbed({
-            color: user?.accentColor,
-            title: `Successfully unblacklisted ${user!.username}#${user!.discriminator}!`,
-            fields: [
-                { name: 'Unblacklisted User', value: `Username: <@${user!.id}> \nUser ID: \`hostUser.uid\` \nDiscord ID: \`${user!.id}\`` },
-                { name: 'Unblacklisted by:', value: `<@${interaction.user.id}>` }
-            ],
-            footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
-        });
-
-        await interaction.followUp({
-            ephemeral: true,
-            content: `<@${user!.id}>`,
-            embeds: [ embed ]
-        });
     }
 }; 

@@ -37,5 +37,4 @@ npm run start
 ```
 
 ### To-Do
-- [ ] `src/commands/Lookup` Debug
-- [ ] `src/commands/Blacklist` => hostUser => API
+- [ ] `src/commands/` Debug
