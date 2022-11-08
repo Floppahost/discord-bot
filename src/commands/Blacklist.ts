@@ -47,7 +47,7 @@ export const Blacklist: Command = {
             const embed = new MessageEmbed({
                 title: `Successfully blacklisted ${user}!`,
                 fields: [
-                    { name: 'Blacklisted User', value: `Username: <@${user!.id}> \nUser ID: \`hostUser.uid\` \nDiscord ID: \`${user!.id}\`` },
+                    { name: 'Blacklisted User', value: `Username: ${user}` },
                     { name: 'Reason', value: `${reason}`, inline: true },
                     { name: 'Blacklisted by:', value: `<@${interaction.user.id}>`, inline: true }
                 ],
