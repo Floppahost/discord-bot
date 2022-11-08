@@ -5,10 +5,12 @@ import { InviteWave } from "./commands/InviteWave";
 import { Blacklist } from "./commands/Blacklist";
 import { Unblacklist } from "./commands/Unblacklist";
 import { ChangePresence } from "./commands/ChangePresence";
+import { Invite } from "./commands/Invite";
 
 export const Commands: Command[] = [
     Ping,
     Lookup,
+    Invite,
     InviteWave,
     Blacklist,
     Unblacklist,

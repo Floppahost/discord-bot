@@ -22,13 +22,12 @@ export const Lookup: Command = {
         const user = interaction.options.getString('username');
 
         const { status, data } = await axios.get<GetUsersResponse>(
-            `${process.env.baseurl}/api/profile/get`,
+            `${process.env.baseurl}/profile/get/${user}`,
             {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `${process.env.jwt}`
                 },
-                data: { username: user }
             }
         );
 
@@ -77,7 +76,7 @@ export const Lookup: Command = {
                     fields: [
                         { name: 'General', value: `Username: \`${user}\` \nUser ID: \`${data.data?.uid}\`` },
                     ],
-                    footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
+                     footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
                 });
 
                 await interaction.followUp({
@@ -91,7 +90,7 @@ export const Lookup: Command = {
                     fields: [
                         { name: 'General', value: `Username: \`${user}\` \nUser ID: \`${data.data?.uid}\` \nBio: \`${data.data?.bio}\`` },
                     ],
-                    footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
+                     footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
                 });
 
                 await interaction.followUp({
@@ -108,7 +107,7 @@ export const Lookup: Command = {
                         { name: 'General', value: `Username: \`${user}\` \nUser ID: \`${data.data?.uid}\`` },
                         { name: 'Stats', value: `Uploads: \`${data.data?.uploads}\`` },
                     ],
-                    footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
+                     footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
                 });
 
                 await interaction.followUp({
@@ -123,7 +122,7 @@ export const Lookup: Command = {
                         { name: 'General', value: `Username: \`${user}\` \nUser ID: \`${data.data?.uid}\` \nBio: \`${data.data?.bio}\`` },
                         { name: 'Stats', value: `Uploads: \`${data.data?.uploads}\`` },
                     ],
-                    footer: { text: `Profile of hostUser.name`, iconURL: interaction.user.displayAvatarURL() }
+                     footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
                 });
 
                 await interaction.followUp({

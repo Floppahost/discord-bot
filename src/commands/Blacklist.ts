@@ -1,5 +1,10 @@
-import { MessageEmbed, CommandInteraction, Client } from "discord.js";
+import { CommandInteraction, Client, MessageEmbed } from "discord.js";
+import axios from "axios";
+import dotenv from 'dotenv';
 import { Command } from "../interfaces/Command";
+import GetUsersResponse from "./../types/GetUsersResponse";
+
+dotenv.config();
 
 export const Blacklist: Command = {
     name: "blacklist",
@@ -8,9 +13,9 @@ export const Blacklist: Command = {
     defaultMemberPermissions: 'ADMINISTRATOR',
     options: [
         {
-            type: "USER",
+            type: "STRING",
             name: "user",
-            description: "The user you want to blacklist.",
+            description: "The username of the user you want to blacklist.",
             required: true,
         },
         {
@@ -21,38 +26,61 @@ export const Blacklist: Command = {
         }
     ],
     run: async (client: Client, interaction: CommandInteraction) => {
-        let user = interaction.options.getUser('user');
-        if (!interaction.options.getUser('user')) {
-            user = interaction.user;
-        }
-        if (user?.accentColor === null) {
-            user.accentColor = undefined;
-        }
-        let reason: string | null = "No reason provided."
+        const user = interaction.options.getUser('user');
+        let reason: string = "No reason provided."
         if (interaction.options.getString('reason') != null) {
-            reason = interaction.options.getString('reason');
+            reason = interaction.options.getString('reason')!;
         }
 
-        /* user.id = user discord id
-            fetch blacklist
-            if (!success) return;
-        */
+        const { status, data } = await axios.get<GetUsersResponse>(
+            `${process.env.baseurl}/admin/blacklist`,
+            {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `${process.env.jwt}`
+                },
+                data: { username: user, reason: reason }
+            }
+        );
 
-        const embed = new MessageEmbed({
-            color: user?.accentColor,
-            title: `Successfully blacklisted ${user!.username}#${user!.discriminator}!`,
-            fields: [
-                { name: 'Blacklisted User', value: `Username: <@${user!.id}> \nUser ID: \`hostUser.uid\` \nDiscord ID: \`${user!.id}\`` },
-                { name: 'Reason', value: `${reason}`, inline: true },
-                { name: 'Blacklisted by:', value: `<@${interaction.user.id}>`, inline: true }
-            ],
-            footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
-        });
+        if (status === 200) {
+            const embed = new MessageEmbed({
+                title: `Successfully blacklisted ${user}!`,
+                fields: [
+                    { name: 'Blacklisted User', value: `Username: ${user}` },
+                    { name: 'Reason', value: `${reason}`, inline: true },
+                    { name: 'Blacklisted by:', value: `<@${interaction.user.id}>`, inline: true }
+                ],
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
 
-        await interaction.followUp({
-            ephemeral: true,
-            content: `<@${user!.id}>`,
-            embeds: [ embed ]
-        });
+            await interaction.followUp({
+                ephemeral: true,
+                content: `<@${user!.id}>`,
+                embeds: [ embed ]
+            });
+        } else if (status === 404) {
+            const embed = new MessageEmbed({
+                title: `There is no user with the name ${user}!`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
+
+            await interaction.followUp({
+                ephemeral: true,
+                content: `<@${user!.id}>`,
+                embeds: [ embed ]
+            });
+        } else {
+            const embed = new MessageEmbed({
+                title: `Error while blacklisting user.`,
+                footer: { text: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: interaction.user.displayAvatarURL() }
+            });
+
+            await interaction.followUp({
+                ephemeral: true,
+                content: `<@${user!.id}>`,
+                embeds: [ embed ]
+            });
+        }
     }
 }; 
